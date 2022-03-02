@@ -20,4 +20,20 @@ contract('Wallet', accounts => {
     assert(quorum.toNumber() === QUORUM);
   });
 
+  it ('shoud create transfers', async () => {
+    const amount = 100, to = accounts[5], fromAddress = accounts[0];
+
+    await wallet.createTransfer(amount, to, { from: fromAddress });
+    const transfers = await wallet.getTransfers();
+    assert(transfers.length === 1);
+    /**
+     * * ints in struct are wrapped with string rather than big number
+     */
+    assert(transfers[0].id === '0');
+    assert(transfers[0].amount === `${amount}`);
+    assert(transfers[0].to === to);
+    assert(transfers[0].approvals === '0');
+    assert(transfers[0].sent === false);
+  });
+
 });
