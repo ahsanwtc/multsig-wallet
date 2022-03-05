@@ -31,6 +31,10 @@ contract Wallet {
     return transfers;
   }
 
+  function fetchTransferApproved(address _address, uint transferId) external view returns(bool) {
+    return approvals[_address][transferId];
+  }
+
   function createTransfer(uint amount, address payable to) external onlyApprover() {
     transfers.push(
       Transfer(
