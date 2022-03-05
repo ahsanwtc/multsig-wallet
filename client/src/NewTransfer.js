@@ -10,7 +10,7 @@ const NewTransfer = ({ createTransfer }) => {
   };
 
   const updateTransfer = (e, field) => {
-    const value = e.traget.value;
+    const value = e.target.value;
     setTransfer({ ...transfer, [field]: value });
   };
 

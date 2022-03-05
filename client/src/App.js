@@ -4,6 +4,7 @@ import './App.css';
 import { getWeb3, getWallet } from './utils'
 import Header from './Header';
 import NewTransfer from './NewTransfer';
+import TransferList from './TransferList';
 
 function App() {
   const [web3, setWeb3] = useState(undefined);
@@ -11,20 +12,23 @@ function App() {
   const [wallet, setWallet] = useState(undefined);
   const [approvers, setApprovers] = useState(undefined);
   const [quorum, setQuorum] = useState(undefined);
+  const [transfers, setTransfers] = useState([]);
 
   useEffect(() => {
     const init = async () => {
-      const web3 = getWeb3();
+      const web3 = await getWeb3();
       const accounts = await web3.eth.getAccounts();
       const wallet = await getWallet(web3);
       const approvers = await wallet.methods.getApprovers().call();
       const quorum = await wallet.methods.quorum().call();
+      const transfers = await wallet.methods.getTransfers().call();
 
       setWeb3(web3);
       setAccounts(accounts);
       setWallet(wallet);
       setApprovers(approvers);
       setQuorum(quorum);
+      setTransfers(transfers);
     };
 
     init();
@@ -32,6 +36,10 @@ function App() {
 
   const createTransfer = transfer => {
     wallet.methods.createTransfer(transfer.amount, transfer.to).send({ from: accounts[0] });
+  };
+
+  const approveTransfer = id => {
+    wallet.methods.approveTransfer(id).send({ from: accounts[0] });
   };
 
   if (web3 === undefined || accounts === undefined || wallet === undefined || approvers === undefined || quorum === undefined) {
@@ -45,6 +53,7 @@ function App() {
       Multsig Dapp
       <Header approvers={approvers} quorum={quorum}/>
       <NewTransfer createTransfer={createTransfer} />
+      <TransferList transfers={transfers} approveTransfer={approveTransfer}/>
     </div>
   );
 }
