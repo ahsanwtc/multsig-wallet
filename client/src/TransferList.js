@@ -1,6 +1,16 @@
 import React from 'react';
 
-const TransferList = ({ transfers, approveTransfer }) => {
+const TransferList = ({ transfers, approveTransfer, approvals }) => {
+
+  const disableButton = transferId => {
+    if (!approvals.hasOwnProperty(transferId)) {
+      return false;
+    }
+
+    return approvals[transferId];
+
+  };
+
   return (
     <div>
       <h2>Transfers</h2>
@@ -22,7 +32,7 @@ const TransferList = ({ transfers, approveTransfer }) => {
               <td>{transfer.to}</td>
               <td>
                 {transfer.approvals}
-                <button onClick={async () => await approveTransfer(transfer.id)}>Approve</button>
+                <button disabled={disableButton(transfer.id)} onClick={async () => await approveTransfer(transfer.id)}>Approve</button>
               </td>
               <td>{transfer.sent ? 'yes' : 'no'}</td>
             </tr>

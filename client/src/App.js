@@ -13,6 +13,7 @@ function App() {
   const [approvers, setApprovers] = useState(undefined);
   const [quorum, setQuorum] = useState(undefined);
   const [transfers, setTransfers] = useState([]);
+  const [approvals, setApprovals] = useState({});
 
   useEffect(() => {
     const init = async () => {
@@ -34,10 +35,26 @@ function App() {
     init();
   }, []);
 
+  useEffect(() => {
+    const fetchApprovedList = async () => {
+      const approvals = {};
+  
+      for (const transfer of transfers) {
+        const approval = await wallet.methods.fetchTransferApproved(accounts[0], transfer.id).call();
+        approvals[transfer.id] = approval;
+      }
+  
+      setApprovals(approvals);
+    
+    };
+
+    fetchApprovedList();
+
+  }, [transfers, wallet, accounts]);
+
   const fetchTransferList = () => {
     new Promise(async () => {
       const transfers = await wallet.methods.getTransfers().call();
-      console.log({transfers});
       setTransfers(transfers);
     });
   };
@@ -47,8 +64,8 @@ function App() {
     fetchTransferList();
   };
 
-  const approveTransfer = id => {
-    wallet.methods.approveTransfer(id).send({ from: accounts[0] });
+  const approveTransfer = async id => {
+    await wallet.methods.approveTransfer(id).send({ from: accounts[0] });
     fetchTransferList();
   };
 
@@ -63,7 +80,7 @@ function App() {
       Multsig Dapp
       <Header approvers={approvers} quorum={quorum} account={accounts[0]}/>
       <NewTransfer createTransfer={createTransfer} />
-      <TransferList transfers={transfers} approveTransfer={approveTransfer}/>
+      <TransferList transfers={transfers} approveTransfer={approveTransfer} approvals={approvals}/>
     </div>
   );
 }
