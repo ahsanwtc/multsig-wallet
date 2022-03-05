@@ -4,9 +4,9 @@ const NewTransfer = ({ createTransfer }) => {
 
   const [transfer, setTransfer] = useState(undefined);
 
-  const submit = e => {
+  const submit = async e => {
     e.preventDefault();
-    createTransfer(transfer);
+    await createTransfer(transfer);
   };
 
   const updateTransfer = (e, field) => {

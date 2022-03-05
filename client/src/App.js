@@ -34,12 +34,22 @@ function App() {
     init();
   }, []);
 
-  const createTransfer = transfer => {
-    wallet.methods.createTransfer(transfer.amount, transfer.to).send({ from: accounts[0] });
+  const fetchTransferList = () => {
+    new Promise(async () => {
+      const transfers = await wallet.methods.getTransfers().call();
+      console.log({transfers});
+      setTransfers(transfers);
+    });
+  };
+
+  const createTransfer = async transfer => {
+    await wallet.methods.createTransfer(transfer.amount, transfer.to).send({ from: accounts[0] });
+    fetchTransferList();
   };
 
   const approveTransfer = id => {
     wallet.methods.approveTransfer(id).send({ from: accounts[0] });
+    fetchTransferList();
   };
 
   if (web3 === undefined || accounts === undefined || wallet === undefined || approvers === undefined || quorum === undefined) {
@@ -51,7 +61,7 @@ function App() {
   return (
     <div className="App">
       Multsig Dapp
-      <Header approvers={approvers} quorum={quorum}/>
+      <Header approvers={approvers} quorum={quorum} account={accounts[0]}/>
       <NewTransfer createTransfer={createTransfer} />
       <TransferList transfers={transfers} approveTransfer={approveTransfer}/>
     </div>
