@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import { getWeb3, getWallet } from './utils'
 import Header from './Header';
+import NewTransfer from './NewTransfer';
 
 function App() {
   const [web3, setWeb3] = useState(undefined);
@@ -29,6 +30,10 @@ function App() {
     init();
   }, []);
 
+  const createTransfer = transfer => {
+    wallet.methods.createTransfer(transfer.amount, transfer.to).send({ from: accounts[0] });
+  };
+
   if (web3 === undefined || accounts === undefined || wallet === undefined || approvers === undefined || quorum === undefined) {
     return (
       <div className="App">Loading...</div>
@@ -39,6 +44,7 @@ function App() {
     <div className="App">
       Multsig Dapp
       <Header approvers={approvers} quorum={quorum}/>
+      <NewTransfer createTransfer={createTransfer} />
     </div>
   );
 }
